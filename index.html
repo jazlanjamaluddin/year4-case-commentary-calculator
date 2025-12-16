@@ -1,507 +1,414 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Year 4 Case Commentary Marks Calculator</title>
-    <style>
-      :root {
-        --um-blue: #003a6c;
-        --um-gold: #ffcc00;
-        --um-red: #c62828;
-        --bg-light: #f4f6fb;
-      }
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Year 4 Case Commentary Marks Calculator</title>
 
-      body {
-        font-family: Arial, sans-serif;
-        padding: 16px;
-        margin: 0;
-        background-color: var(--bg-light);
-      }
+<style>
+:root {
+  --um-blue:#003a6c;
+  --um-gold:#ffcc00;
+  --um-red:#c62828;
+  --bg:#f4f6fb;
+}
+body{font-family:Arial,sans-serif;background:var(--bg);margin:0;padding:16px}
+.container{max-width:980px;margin:auto;background:#fff;border-radius:10px;box-shadow:0 2px 10px rgba(0,0,0,.12);overflow:hidden}
+.header{background:var(--um-blue);color:#fff;text-align:center;padding:14px 16px 10px}
+.header img{max-height:60px;max-width:90%;height:auto;margin-bottom:8px}
+.header h1{margin:4px 0 0;font-size:1.3rem}
+.header .sub{margin-top:6px;font-size:.9rem;opacity:.9}
+.content{padding:16px}
+.hint{background:#fff9e6;border-left:4px solid var(--um-gold);padding:10px 12px;border-radius:6px;margin:0 0 14px 0;color:#333}
+.domain{border:1px solid #e1e6f2;border-radius:10px;margin-bottom:14px;overflow:auto}
+.domain-head{background:#f7f9ff;padding:12px;display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.domain-title{font-weight:700;color:var(--um-blue);display:flex;align-items:center;gap:8px;position:relative}
+.weight-pill{font-size:.9rem;color:#2b2b2b;background:#fff;border:1px solid #e1e6f2;padding:6px 10px;border-radius:999px;white-space:nowrap}
 
-      .container {
-        max-width: 980px;
-        margin: 0 auto;
-        background-color: #ffffff;
-        padding: 0;
-        box-sizing: border-box;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.12);
-        border-radius: 10px;
-        overflow: hidden;
-      }
+/* ▼ / ▲ toggle button */
+.guide-btn{
+  border:none;
+  background:transparent;
+  color:var(--um-blue);
+  font-weight:700;
+  font-size:1rem;
+  cursor:pointer;
+  padding:0 4px;
+  line-height:1;
+}
 
-      .header {
-        background: var(--um-blue);
-        color: #ffffff;
-        padding: 16px;
-        text-align: center;
-      }
+/* General guide tooltip (click toggle) */
+.tooltip{
+  display:none;
+  position:absolute;
+  left:0;
+  top:28px;
+  width:min(650px,90vw);
+  max-height:80vh;
+  overflow-y:auto;
+  background:#fff;
+  border:1px solid #cfd6ea;
+  border-radius:10px;
+  padding:10px 12px;
+  font-size:.78rem;
+  color:#222;
+  box-shadow:0 2px 8px rgba(0,0,0,.15);
+  z-index:10;
+  text-align:left;
+}
+.tooltip.open{display:block}
+.tooltip .t-title{font-weight:700;color:var(--um-blue);margin-bottom:6px;text-align:left}
+.tooltip pre{
+  margin:0;
+  white-space:pre-wrap;
+  font-family:Arial,sans-serif;
+  line-height:1.35;
+  text-align:left;
+}
 
-      .header h1 {
-        margin: 0;
-        font-size: 1.3rem;
-      }
+.domain-body{display:grid;grid-template-columns:240px 1fr;gap:12px;padding:12px}
+label{font-weight:700;color:var(--um-blue);display:block;margin-bottom:6px}
+.score-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+input[type=number]{
+  width:78px;
+  box-sizing:border-box;
+  padding:10px;
+  border-radius:8px;
+  border:1px solid #cfd6ea;
+  font-size:1rem
+}
+input[type=number]:focus{outline:none;border-color:var(--um-blue);box-shadow:0 0 0 2px rgba(0,58,108,.18)}
+.band-pill{
+  font-size:.85rem;color:#333;background:#fff;border:1px solid #d8def2;
+  padding:6px 10px;border-radius:999px;white-space:nowrap;
+}
+.weighted{
+  margin-top:10px;
+  padding:10px;
+  border-radius:10px;
+  background:#fff;
+  border:1px solid #e1e6f2;
+  font-size:.95rem
+}
+.weighted .label{font-weight:700;color:var(--um-blue)}
+.rubric{
+  background:#fbfcff;
+  border:1px solid #e1e6f2;
+  border-radius:10px;
+  padding:12px;
+  width:100%;
+  box-sizing:border-box;
+}
+.rubric strong{display:block;color:var(--um-blue);margin-bottom:6px}
+.rubric p{
+  margin:0;
+  color:#222;
+  line-height:1.35;
+  font-size:.9rem;
+  white-space:pre-wrap;
+  overflow-wrap:anywhere;
+  word-break:break-word;
+}
+.total{
+  display:none;
+  margin-top:16px;
+  padding:14px;
+  border-radius:12px;
+  text-align:center;
+  font-weight:800;
+  font-size:1.1rem;
+  border:2px solid transparent
+}
+.total.pass{background:#e8f5e9;color:#2e7d32;border-color:#2e7d32}
+.total.fail{background:#ffebee;color:#c62828;border-color:#c62828}
+.actions{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}
+button{
+  padding:10px 14px;
+  border-radius:10px;
+  border:1px solid #cfd6ea;
+  cursor:pointer;
+  font-weight:700;
+  font-size:.95rem;
+  background:#fff
+}
+button.primary{border:none;color:#fff;background:linear-gradient(90deg,var(--um-blue),#005b9f)}
+button.primary:hover{background:linear-gradient(90deg,#005b9f,var(--um-blue))}
+@media(max-width:840px){
+  .domain-body{grid-template-columns:1fr}
+  input[type=number]{width:100%}
+}
+</style>
+</head>
 
-      .header .sub {
-        margin-top: 6px;
-        font-size: 0.9rem;
-        opacity: 0.9;
-      }
+<body>
+<div class="container">
+  <div class="header">
+    <!-- Optional: upload your logo file to GitHub as um-logo.png -->
+    <img src="um-logo.png" alt="Universiti Malaya Logo" onerror="this.style.display='none';">
+    <h1>Year 4 Case Commentary Marks Calculator</h1>
+    <div class="sub">Weighted total out of 100</div>
+  </div>
 
-      .content {
-        padding: 16px;
-      }
-
-      .hint {
-        font-size: 0.92rem;
-        color: #333;
-        margin: 0 0 14px 0;
-        padding: 10px 12px;
-        border-left: 4px solid var(--um-gold);
-        background-color: #fff9e6;
-        border-radius: 6px;
-      }
-
-      .grid {
-        display: grid;
-        grid-template-columns: 1fr;
-        gap: 12px;
-      }
-
-      .domain-card {
-        border: 1px solid #e1e6f2;
-        border-radius: 10px;
-        overflow: hidden;
-      }
-
-      .domain-head {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        justify-content: space-between;
-        gap: 10px;
-        padding: 12px;
-        background: #f7f9ff;
-        border-bottom: 1px solid #e1e6f2;
-      }
-
-      .domain-title {
-        margin: 0;
-        font-weight: 700;
-        color: var(--um-blue);
-        font-size: 1rem;
-      }
-
-      .domain-weight {
-        font-size: 0.9rem;
-        color: #2b2b2b;
-        background: #ffffff;
-        border: 1px solid #e1e6f2;
-        padding: 6px 10px;
-        border-radius: 999px;
-      }
-
-      .domain-body {
-        display: grid;
-        grid-template-columns: 280px 1fr;
-        gap: 12px;
-        padding: 12px;
-      }
-
-      .input-block label {
-        display: block;
-        font-weight: 700;
-        color: var(--um-blue);
-        margin-bottom: 6px;
-      }
-
-      .row {
-        display: flex;
-        gap: 10px;
-        align-items: center;
-      }
-
-      input[type="number"] {
-        width: 110px;
-        box-sizing: border-box;
-        padding: 10px;
-        border-radius: 8px;
-        border: 1px solid #cfd6ea;
-        font-size: 1rem;
-      }
-
-      input[type="number"]:focus {
-        outline: none;
-        border-color: var(--um-blue);
-        box-shadow: 0 0 0 2px rgba(0, 58, 108, 0.18);
-      }
-
-      .small {
-        font-size: 0.85rem;
-        color: #444;
-      }
-
-      .badge {
-        display: inline-block;
-        font-size: 0.85rem;
-        padding: 6px 10px;
-        border-radius: 999px;
-        border: 1px solid #d8def2;
-        background: #ffffff;
-        color: #333;
-        white-space: nowrap;
-      }
-
-      .weighted {
-        margin-top: 10px;
-        padding: 10px;
-        border-radius: 10px;
-        background: #ffffff;
-        border: 1px solid #e1e6f2;
-      }
-
-      .weighted .label {
-        font-weight: 700;
-        color: var(--um-blue);
-      }
-
-      .rubric {
-        background: #fbfcff;
-        border: 1px solid #e1e6f2;
-        border-radius: 10px;
-        padding: 12px;
-        min-height: 86px;
-      }
-
-      .rubric strong {
-        display: block;
-        color: var(--um-blue);
-        margin-bottom: 6px;
-      }
-
-      .rubric p {
-        margin: 0;
-        color: #222;
-        line-height: 1.35;
-        font-size: 0.9rem;
-      }
-
-      .error {
-        color: var(--um-red);
-        font-size: 0.9rem;
-        min-height: 1.2em;
-        margin-top: 10px;
-      }
-
-      .total {
-        margin-top: 14px;
-        padding: 14px;
-        border-radius: 12px;
-        border: 2px solid transparent;
-        display: none;
-        font-weight: 800;
-        text-align: center;
-        font-size: 1.1rem;
-      }
-
-      .total.pass {
-        background: #e8f5e9;
-        color: #2e7d32;
-        border-color: #2e7d32;
-      }
-
-      .total.fail {
-        background: #ffebee;
-        color: #c62828;
-        border-color: #c62828;
-      }
-
-      .actions {
-        display: flex;
-        gap: 10px;
-        margin-top: 12px;
-        flex-wrap: wrap;
-      }
-
-      button {
-        padding: 10px 14px;
-        border-radius: 10px;
-        border: 1px solid #cfd6ea;
-        cursor: pointer;
-        font-weight: 700;
-        font-size: 0.95rem;
-        background: #ffffff;
-      }
-
-      button.primary {
-        border: none;
-        color: #ffffff;
-        background: linear-gradient(90deg, var(--um-blue), #005b9f);
-      }
-
-      button.primary:hover {
-        background: linear-gradient(90deg, #005b9f, var(--um-blue));
-      }
-
-      button:disabled {
-        opacity: 0.7;
-        cursor: default;
-      }
-
-      @media (max-width: 840px) {
-        .domain-body {
-          grid-template-columns: 1fr;
-        }
-        input[type="number"] {
-          width: 100%;
-        }
-        .row {
-          align-items: stretch;
-        }
-      }
-    </style>
-  </head>
-
-  <body>
-    <div class="container">
-      <div class="header">
-        <h1>Year 4 Case Commentary Marks Calculator</h1>
-        <div class="sub">Pilot rubric: weighted total out of 100</div>
-      </div>
-
-      <div class="content">
-        <div class="hint">
-          Enter marks from 0 to 10 for each domain. Rubric descriptors update automatically. The total appears live once all four scores are valid.
-        </div>
-
-        <div class="grid" id="grid"></div>
-
-        <div class="error" id="status"></div>
-
-        <div class="total" id="totalBox">
-          TOTAL: <span id="totalPct"></span>
-        </div>
-
-        <div class="actions">
-          <button class="primary" id="resetBtn" type="button">Reset</button>
-        </div>
-      </div>
+  <div class="content">
+    <div class="hint">
+      Enter marks from 0 to 10 for each domain. The total appears automatically once all domain scores are completed.
     </div>
 
-    <script>
-      // Band labels from the rubric grid (0-2, 3-4, 5-6, 7-8, 9-10). :contentReference[oaicite:2]{index=2}
-      const bands = [
-        { min: 0, max: 2, label: "Needs improvement (0-2)" },
-        { min: 3, max: 4, label: "Fairly satisfactory (3-4)" },
-        { min: 5, max: 6, label: "Satisfactory (5-6)" },
-        { min: 7, max: 8, label: "Good (7-8)" },
-        { min: 9, max: 10, label: "Excellent (9-10)" },
-      ];
+    <div id="domains"></div>
 
-      // Domains and weights (Clinical Summary 30%, Literature Review 15%, Discussion & Conclusion 50%, Style 5%). :contentReference[oaicite:3]{index=3} :contentReference[oaicite:4]{index=4} :contentReference[oaicite:5]{index=5} :contentReference[oaicite:6]{index=6}
-      const domains = [
-        {
-          id: "clinical",
-          title: "Clinical Summary",
-          weight: 30,
-          rubric: [
-            // Needs improvement :contentReference[oaicite:7]{index=7}
-            "Incomplete or unclear summary. Major clinical details missing or inaccurate. Lacks logical flow and fails to convey the patient’s story or care journey. No mention of patient context and primary care context.",
-            // Fairly satisfactory :contentReference[oaicite:8]{index=8}
-            "Basic and factual summary with limited organisation or interpretation. Key patient information included but lacks synthesis or insight. Focuses mainly on biomedical aspects with minimal reflection on the relevance or impact of the case to the patient and in the primary care context.",
-            // Satisfactory :contentReference[oaicite:9]{index=9}
-            "Adequate and generally clear summary covering main clinical details. Demonstrates basic understanding of the primary care approach. Some recognition of patient context, but lacks depth or holistic consideration.",
-            // Good :contentReference[oaicite:10]{index=10}
-            "Clear and well-organised summary that presents the clinical finding within the primary care context. Demonstrates sound clinical reasoning and awareness of patient-centered care. Addresses key biopsychosocial factors and their relevance to management, though with limited depth or integration.",
-            // Excellent :contentReference[oaicite:11]{index=11}
-            "Comprehensive and integrated summary that reflects the principles of holistic, patient-centered primary care. Demonstrates depth of clinical reasoning and management challenges, linking biopsychosocial factors. Clearly articulates the impact on the patient, family, and community.",
-          ],
-        },
-        {
-          id: "literature",
-          title: "Literature Review",
-          weight: 15,
-          rubric: [
-            // Needs improvement :contentReference[oaicite:12]{index=12}
-            "Minimal or no literature review. No or irrelevant citations. No evidence of critical thinking or connection to the case or primary care context.",
-            // Fairly satisfactory :contentReference[oaicite:13]{index=13}
-            "Limited literature review with few and/or outdated sources. Mostly descriptive with little to no critical comment. Lacks clear evaluation of the applicability of cited studies. Minimal linkage to primary care relevance.",
-            // Satisfactory :contentReference[oaicite:14]{index=14}
-            "Basic literature review using some relevant and recent sources. Shows awareness of current knowledge with some critical reflection on applicability or limitations. Includes some reference to evidence-based guidelines and relevance to primary care practice.",
-            // Good :contentReference[oaicite:15]{index=15} :contentReference[oaicite:16]{index=16}
-            "Adequate and coherent literature review with relevant and recent sources. Demonstrates moderate critical analysis by commenting on the applicability and limitations of evidence. Integrates current evidence-based guidelines with clear relevance to primary care practice.",
-            // Excellent :contentReference[oaicite:17]{index=17}
-            "Comprehensive, up-to-date, and well-structured literature review. Demonstrates strong critical analysis and synthesis of current knowledge, explicitly evaluating the applicability, limitations, and selected aspects of evidence quality. Excellent integration of findings with clear discussion of implications for primary care practice.",
-          ],
-        },
-        {
-          id: "discussion",
-          title: "Discussion and Conclusion",
-          weight: 50,
-          rubric: [
-            // Needs improvement :contentReference[oaicite:18]{index=18}
-            "Superficial or unclear discussion. Lacks relevance to the case. Heavily theoretical or vague with no clear linkage to the patient or primary care context. No or minimal use of evidence. Disorganised or incoherent.",
-            // Fairly satisfactory :contentReference[oaicite:19]{index=19}
-            "Basic discussion with some link to the case but lacks depth or consistency. Theoretical concepts are present but weakly applied. Limited integration of evidence. Minimal primary care relevance. Structure lacks clarity or coherence.",
-            // Satisfactory :contentReference[oaicite:20]{index=20}
-            "Adequate discussion with reasonable linkage to the case. Some theoretical concepts and evidence are applied, though not always well integrated. Shows understanding of primary care principles, but lacks depth or clarity in parts. Some reflection in discussion.",
-            // Good :contentReference[oaicite:21]{index=21}
-            "Clear and coherent discussion. Theory and evidence are appropriately applied and integrated into the case. Good linkage to patient’s context and relevance to family medicine. Demonstrates critical thinking within a primary care framework. Able to reflect on own practice and knowledge.",
-            // Excellent :contentReference[oaicite:22]{index=22}
-            "Comprehensive, insightful, coherent, and well-structured discussion. Strong linkage to patient’s case throughout. Effectively applies theory and integrates current, relevant evidence. Demonstrates deep understanding of primary care principles, continuity, comprehensiveness, and patient-centred care including thorough consideration of social determinants, community resources and health promotion. Able to critically reflect on own practices and knowledge. Able to identify areas of improvement.",
-          ],
-        },
-        {
-          id: "style",
-          title: "Style",
-          weight: 5,
-          rubric: [
-            // Needs improvement :contentReference[oaicite:23]{index=23}
-            "Writing is unclear and confusing. Frequent grammar, spelling, or punctuation errors. Overly wordy or repetitive; lacks conciseness. Informal or inappropriate tone for academic/clinical context. Inconsistent terminology and formatting. Writing lacks flow; ideas jump without coherence.",
-            // Fairly satisfactory :contentReference[oaicite:24]{index=24}
-            "Some clarity but occasionally confusing sentences. Noticeable grammar and punctuation errors. Some repetition or unnecessary words. Tone occasionally too informal or inconsistent. Terminology and formatting inconsistently applied. Flow and coherence need improvement.",
-            // Satisfactory :contentReference[oaicite:25]{index=25}
-            "Generally clear and understandable writing. Minor grammar or punctuation errors not distracting. Mostly concise, some redundant phrases. Appropriate tone for context but could be more polished. Terminology and formatting mostly consistent. Logical flow with minor lapses.",
-            // Good :contentReference[oaicite:26]{index=26}
-            "Clear and well-structured writing. Few, if any, grammar or punctuation errors. Concise and precise language. Professional and consistent tone. Terminology and formatting consistently applied. Smooth flow with coherent transitions.",
-            // Excellent :contentReference[oaicite:27]{index=27}
-            "Exceptionally clear, concise, and polished writing. Error-free grammar, punctuation, and spelling. Engaging and professional tone throughout. Consistent and precise use of terminology and formatting. Seamless flow, excellent logical progression of idea.",
-          ],
-        },
-      ];
+    <div class="total" id="totalBox">
+      TOTAL: <span id="totalPct"></span>
+    </div>
 
-      const grid = document.getElementById("grid");
-      const statusEl = document.getElementById("status");
-      const totalBox = document.getElementById("totalBox");
-      const totalPct = document.getElementById("totalPct");
-      const resetBtn = document.getElementById("resetBtn");
+    <div class="actions">
+      <button class="primary" id="resetBtn" type="button">Reset</button>
+    </div>
+  </div>
+</div>
 
-      function bandIndex(score) {
-        for (let i = 0; i < bands.length; i++) {
-          if (score >= bands[i].min && score <= bands[i].max) return i;
-        }
-        return null;
+<script>
+const domains = [
+  {
+    id: "clinical",
+    title: "Clinical Summary",
+    weight: 30,
+    guide:
+`• Depth and relevance of clinical details – includes pertinent clinical information that is relevant to the case, demonstrating a good grasp of the patient’s presentation and context.
+• Patient-centredness – focuses on the patient as a whole by demonstrating a holistic approach that incorporates biopsychosocial aspect rather than solely on the disease.
+• Clinical reasoning – demonstrates sound clinical judgement in interpreting findings, formulating differential diagnoses, and explaining decision-making processes.
+• Primary care context – Addresses care within a biopsychosocial framework typical of primary care practice. Reflects the realities of managing the case within the scope and setting of primary care
+• Coherent and logical flow – information is organised logically, with a clear sequence that facilitates understanding of the case progression.`,
+    rubric: [
+`Incomplete or unclear summary. Major clinical details missing or inaccurate. Lacks logical flow and fails to convey the patient’s story or care journey. No mention of patient context and primary care context.`,
+`Basic and factual summary with limited organisation or interpretation. Key patient information included but lacks ynthesis or insight. Focuses  mainly on biomedical aspects with minimal reflection on the relevance or impact of the case to the patient and in the primary care context.`,
+`Adequate and generally clear summary covering main clinical details. Demonstrates basic understanding of the primary care approach. Some recognition of patient context, but lacks depth or holistic consideration.`,
+`Clear and well organised summary that presents the clinical finding within the primary care context. Demonstrates sound clinical reasoning and awareness of patient centered care. Addresses key biopsychosocial factors and their relevance to management, though with limited depth or integration.`,
+`Comprehensive and integrated summary that reflects the principles of holistic, patient centered primary care. Demonstrates depth of clinical reasoning and management challenges, linking biopsychosocial factors. Clearly articulates the impact on the patient, family, and community.`
+    ]
+  },
+  {
+    id: "literature",
+    title: "Literature Review",
+    weight: 15,
+    guide:
+`• Current knowledge — recent primary studies, reviews, and clinical guidelines for up-to-date referencing.
+• Relevance to primary care context — integration of literature with implications for primary care practice.
+• Critical analysis — evaluation of applicability, or limitations of studies with some aspects of quality (not just summarising)`,
+    rubric: [
+`Minimal or no literature review. No or irrelevant citations. No evidence of critical thinking or connection to the case or primary care context.`,
+`Limited literature review with few and/or outdated sources. Mostly descriptive with little to no critical comment. Lacks clear evaluation of the applicability of cited studies. Minimal linkage to primary care 
+relevance.`,
+`Basic literature review using some relevant and recent sources. Shows awareness of current knowledge with some critical reflection on applicability or limitations. Includes some reference to evidence-based guidelines and relevance to primary care practice.`,
+`Adequate and coherent literature review with relevant and recent sources. Demonstrates moderate critical analysis by commenting on the applicability and limitations of evidence. Integrates current evidence based guidelines with clear relevance to primary care practice.`,
+`Comprehensive, up-to-date, and well-structured literature review. Demonstrates strong critical analysis and synthesis of current knowledge, explicitly evaluating the applicability, limitations, and selected aspects of evidence quality. Excellent integration of findings with clear discussion of implications for primary care practice.`
+    ]
+  },
+  {
+    id: "discussion",
+    title: "Discussion and Conclusion",
+    weight: 50,
+    guide:
+`• Relevance to the case - clearly linked to and contextualised around the patient case 
+• Application of concept or theory - meaningful and relevant application and integration into the discussion.
+• Evidence-based reasoning - points are supported with current, relevant literature or clinical guidelines
+• Primary care perspective - demonstrates understanding of primary care principles and context of primary care practice.
+• Critical thinking and reflection - shows ability to analyse, interpret, and synthesise information thoughtfully and includes reflective insight where appropriate.
+• Clarity and coherence - ideas are presented in a logical sequence with clear structure and flow.`,
+    rubric: [
+`Superficial or unclear discussion. Lacks relevance to the case. Heavily theoretical or vague with no clear linkage to the patient or primary care context. No or minimal use of evidence. Disorganised or incoherent.`,
+`Basic discussion with some link to the case but lacks depth or consistency. Theoretical concepts are present but weakly applied. Limited integration of evidence. Minimal primary care relevance. Structure lacks clarity or coherence.`,
+`Adequate discussion with reasonable linkage to the case. Some theoretical concepts and evidence are applied, though not always well integrated. Shows understanding of primary care principles, but lacks depth or clarity in parts. Some reflection in discussion.`,
+`Clear and coherent discussion. Theory and evidence are appropriately applied and integrated into the case. Good linkage to patient’s context and relevance to family medicine. Demonstrates critical thinking within a primary care framework. Able to reflect on own practice and knowledge`,
+`Comprehensive, insightful, coherent, and well-structured discussion. Strong linkage to patient’s case throughout. Effectively applies theory and integrates current, relevant evidence. Demonstrates deep understanding of primary care principles, continuity, comprehensiveness, and patient centred care including thorough consideration of social determinants, community resources and health promotion. Able to critically reflect on own practices and knowledge. Able to identify areas of improvement.`
+    ]
+  },
+  {
+    id: "style",
+    title: "Style",
+    weight: 5,
+    guide:
+`• Clarity - writing is clear and easy to understand, avoiding ambiguity. 
+• Conciseness - ideas are expressed succinctly without unnecessary words or repetition. 
+• Professional tone - language is appropriate for academic or clinical context formal but readable. 
+• Grammar and syntax - correct use of grammar, punctuation, and sentence structure. 
+• Consistency - consistent use of terminology, formatting, and referencing style. 
+• Engagement - writing flows smoothly, maintaining reader interest and logical progression.`,
+    rubric: [
+`Writing is unclear and confusing. Frequent grammar, spelling, or punctuation errors. Overly wordy or repetitive; lacks conciseness. Informal or inappropriate tone for academic/clinical context. Inconsistent terminology and formatting. Writing lacks flow ideas jump without coherence.`,
+`Some clarity but occasionally confusing sentences. Noticeable grammar and punctuation errors. Some repetition or unnecessary words. Tone occasionally too informal or inconsistent. Terminology and formatting inconsistently applied. Flow and coherence need improvement.`,
+`Generally clear and understandable writing. Minor grammar or punctuation errors not distracting. Mostly concise, some redundant phrases. Appropriate tone for context but could be more polished. Terminology and formatting mostly consistent. Logical flow with minor lapses.`,
+`Clear and well structured writing. Few, if any, grammar or punctuation errors. Concise and precise language. Professional and consistent tone. Terminology and formatting consistently applied. Smooth flow with coherent transitions.`,
+`Exceptionally clear, concise, and polished writing. Error-free grammar, punctuation, and spelling. Engaging and professional tone throughout. Consistent and precise use of terminology and formatting. Seamless flow, excellent logical progression of idea`
+    ]
+  }
+];
+
+function bandLabel(score){
+  if(score <= 2) return "Needs improvement (0-2)";
+  if(score <= 4) return "Fairly satisfactory (3-4)";
+  if(score <= 6) return "Satisfactory (5-6)";
+  if(score <= 8) return "Good (7-8)";
+  return "Excellent (9-10)";
+}
+
+function bandIndex(score){
+  if(score <= 2) return 0;
+  if(score <= 4) return 1;
+  if(score <= 6) return 2;
+  if(score <= 8) return 3;
+  return 4;
+}
+
+function isValidScore(v){
+  if(v === "" || v === null || v === undefined) return false;
+  const n = Number(v);
+  return Number.isFinite(n) && n >= 0 && n <= 10;
+}
+
+function weighted(score, weight){
+  return (Number(score)/10) * weight;
+}
+
+const domainsEl = document.getElementById("domains");
+const totalBox = document.getElementById("totalBox");
+const totalPct = document.getElementById("totalPct");
+const resetBtn = document.getElementById("resetBtn");
+
+function render(){
+  domainsEl.innerHTML = "";
+  domains.forEach(d => {
+    const div = document.createElement("div");
+    div.className = "domain";
+
+    const guideWithoutTitle = d.guide.replace(/^General guide\\s*/,"");
+
+    div.innerHTML = `
+      <div class="domain-head">
+        <div class="domain-title">
+          ${d.title}
+          <button class="guide-btn" type="button" aria-expanded="false">▼</button>
+          <div class="tooltip" role="tooltip">
+            <div class="t-title">General guide</div>
+            <pre>${guideWithoutTitle}</pre>
+          </div>
+        </div>
+        <div class="weight-pill">${d.weight}%</div>
+      </div>
+
+      <div class="domain-body">
+        <div>
+          <label for="score-${d.id}">Marks (0–10)</label>
+          <div class="score-row">
+            <input id="score-${d.id}" type="number" min="0" max="10" step="any" inputmode="decimal" />
+            <span class="band-pill" id="band-${d.id}">Band: —</span>
+          </div>
+
+          <div class="weighted">
+            <span class="label">Weighted Marks:</span>
+            <span id="w-${d.id}">—</span>
+          </div>
+        </div>
+
+        <div class="rubric" id="rubric-${d.id}">
+          <strong>Descriptor</strong>
+          <p>Enter a score to view descriptor.</p>
+        </div>
+      </div>
+    `;
+    domainsEl.appendChild(div);
+  });
+
+  setupGuideToggles();
+}
+
+function setupGuideToggles(){
+  const buttons = document.querySelectorAll(".guide-btn");
+  buttons.forEach(btn => {
+    btn.addEventListener("click", (e) => {
+      e.stopPropagation();
+
+      const tooltip = btn.nextElementSibling;
+      const isOpen = tooltip.classList.contains("open");
+
+      // close all first
+      document.querySelectorAll(".tooltip").forEach(t => t.classList.remove("open"));
+      document.querySelectorAll(".guide-btn").forEach(b => {
+        b.textContent = "▼";
+        b.setAttribute("aria-expanded", "false");
+      });
+
+      // then open clicked if it was closed
+      if(!isOpen){
+        tooltip.classList.add("open");
+        btn.textContent = "▲";
+        btn.setAttribute("aria-expanded", "true");
       }
+    });
+  });
 
-      function isValidScore(v) {
-        if (v === "" || v === null || v === undefined) return false;
-        const n = Number(v);
-        return Number.isFinite(n) && n >= 0 && n <= 10;
-      }
+  // click outside closes all
+  document.addEventListener("click", () => {
+    document.querySelectorAll(".tooltip").forEach(t => t.classList.remove("open"));
+    document.querySelectorAll(".guide-btn").forEach(b => {
+      b.textContent = "▼";
+      b.setAttribute("aria-expanded", "false");
+    });
+  });
+}
 
-      function weighted(score, weight) {
-        // (mark/10) * weight   :contentReference[oaicite:28]{index=28}
-        return (Number(score) / 10) * weight;
-      }
+function updateAll(){
+  let total = 0;
+  let complete = true;
 
-      function render() {
-        grid.innerHTML = "";
-        for (const d of domains) {
-          const card = document.createElement("div");
-          card.className = "domain-card";
+  domains.forEach(d => {
+    const input = document.getElementById(`score-${d.id}`);
+    const rEl = document.getElementById(`rubric-${d.id}`);
+    const wEl = document.getElementById(`w-${d.id}`);
+    const bEl = document.getElementById(`band-${d.id}`);
 
-          card.innerHTML = `
-            <div class="domain-head">
-              <div>
-                <div class="domain-title">${d.title}</div>
-              </div>
-              <div class="domain-weight">Weight: ${d.weight}%</div>
-            </div>
+    const v = input.value;
 
-            <div class="domain-body">
-              <div class="input-block">
-                <label for="score-${d.id}">Marks (0–10)</label>
-                <div class="row">
-                  <input id="score-${d.id}" type="number" min="0" max="10" step="any" inputmode="decimal" />
-                  <span class="badge" id="band-${d.id}">Band: —</span>
-                </div>
+    if(!isValidScore(v)){
+      complete = false;
+      wEl.textContent = "—";
+      bEl.textContent = "Band: —";
+      rEl.innerHTML = `<strong>Descriptor</strong><p>Enter a score to view descriptor.</p>`;
+      return;
+    }
 
-                <div class="weighted">
-                  <div><span class="label">Weighted Marks:</span> <span id="w-${d.id}">—</span></div>
-                  <div class="small">(mark ÷ 10) × ${d.weight}</div>
-                </div>
-              </div>
+    const score = Number(v);
+    const idx = bandIndex(score);
+    const w = weighted(score, d.weight);
 
-              <div class="rubric" id="rubric-${d.id}">
-                <strong>Descriptor</strong>
-                <p>Enter a score to view the descriptor.</p>
-              </div>
-            </div>
-          `;
+    bEl.textContent = "Band: " + bandLabel(score);
+    wEl.textContent = `${w.toFixed(1)}%`;
+    rEl.innerHTML = `<strong>Descriptor</strong><p>${d.rubric[idx]}</p>`;
 
-          grid.appendChild(card);
-        }
-      }
+    total += w;
+  });
 
-      function updateOne(d) {
-        const input = document.getElementById(`score-${d.id}`);
-        const bandEl = document.getElementById(`band-${d.id}`);
-        const wEl = document.getElementById(`w-${d.id}`);
-        const rEl = document.getElementById(`rubric-${d.id}`);
+  if(complete){
+    const pass = total >= 50;
+    totalPct.textContent = `${total.toFixed(1)}% ${pass ? "(Pass)" : "(Fail)"}`;
+    totalBox.classList.remove("pass","fail");
+    totalBox.classList.add(pass ? "pass" : "fail");
+    totalBox.style.display = "block";
+  } else {
+    totalBox.style.display = "none";
+  }
+}
 
-        const v = input.value;
+render();
+domains.forEach(d => {
+  document.getElementById(`score-${d.id}`).addEventListener("input", updateAll);
+});
 
-        if (!isValidScore(v)) {
-          bandEl.textContent = "Band: —";
-          wEl.textContent = "—";
-          rEl.innerHTML = `<strong>Descriptor</strong><p>Enter a score from 0 to 10.</p>`;
-          return { ok: false, score: null, weighted: null };
-        }
+resetBtn.addEventListener("click", () => {
+  domains.forEach(d => (document.getElementById(`score-${d.id}`).value = ""));
+  updateAll();
+});
 
-        const score = Number(v);
-        const idx = bandIndex(score);
-        const bandLabel = idx === null ? "—" : bands[idx].label;
-
-        bandEl.textContent = `Band: ${bandLabel}`;
-        const w = weighted(score, d.weight);
-        wEl.textContent = `${w.toFixed(1)}%`;
-
-        if (idx !== null && d.rubric[idx]) {
-          rEl.innerHTML = `<strong>${bandLabel}</strong><p>${d.rubric[idx]}</p>`;
-        } else {
-          rEl.innerHTML = `<strong>Descriptor</strong><p>—</p>`;
-        }
-
-        return { ok: true, score, weighted: w };
-      }
-
-      function updateAll() {
-        statusEl.textContent = "";
-
-        const results = domains.map(updateOne);
-        const allOk = results.every(r => r.ok);
-
-        if (!allOk) {
-          totalBox.style.display = "none";
-          return;
-        }
-
-        const total = results.reduce((sum, r) => sum + r.weighted, 0);
-        totalPct.textContent = `${total.toFixed(1)}%`;
-
-        // Same pass/fail display rule you used before:
-        totalBox.classList.remove("pass", "fail");
-        totalBox.classList.add(total >= 50 ? "pass" : "fail");
-        totalBox.style.display = "block";
-      }
-
-      function attachListeners() {
-        for (const d of domains) {
-          const input = document.getElementById(`score-${d.id}`);
-          input.addEventListener("input", updateAll);
-        }
-
-        resetBtn.addEventListener("click", () => {
-          for (const d of domains) {
-            document.getElementById(`score-${d.id}`).value = "";
-          }
-          updateAll();
-        });
-      }
-
-      render();
-      attachListeners();
-      updateAll();
-    </script>
-  </body>
+updateAll();
+</script>
+</body>
 </html>
