@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Year 4 Case Commentary Marks Calculator</title>
+    <style>
+      :root {
+        --um-blue: #003a6c;
+        --um-gold: #ffcc00;
+        --um-red: #c62828;
+        --bg-light: #f4f6fb;
+      }
+
+      body {
+        font-family: Arial, sans-serif;
+        padding: 16px;
+        margin: 0;
+        background-color: var(--bg-light);
+      }
+
+      .container {
+        max-width: 980px;
+        margin: 0 auto;
+        background-color: #ffffff;
+        padding: 0;
+        box-sizing: border-box;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.12);
+        border-radius: 10px;
+        overflow: hidden;
+      }
+
+      .header {
+        background: var(--um-blue);
+        color: #ffffff;
+        padding: 16px;
+        text-align: center;
+      }
+
+      .header h1 {
+        margin: 0;
+        font-size: 1.3rem;
+      }
+
+      .header .sub {
+        margin-top: 6px;
+        font-size: 0.9rem;
+        opacity: 0.9;
+      }
+
+      .content {
+        padding: 16px;
+      }
+
+      .hint {
+        font-size: 0.92rem;
+        color: #333;
+        margin: 0 0 14px 0;
+        padding: 10px 12px;
+        border-left: 4px solid var(--um-gold);
+        background-color: #fff9e6;
+        border-radius: 6px;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 12px;
+      }
+
+      .domain-card {
+        border: 1px solid #e1e6f2;
+        border-radius: 10px;
+        overflow: hidden;
+      }
+
+      .domain-head {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        padding: 12px;
+        background: #f7f9ff;
+        border-bottom: 1px solid #e1e6f2;
+      }
+
+      .domain-title {
+        margin: 0;
+        font-weight: 700;
+        color: var(--um-blue);
+        font-size: 1rem;
+      }
+
+      .domain-weight {
+        font-size: 0.9rem;
+        color: #2b2b2b;
+        background: #ffffff;
+        border: 1px solid #e1e6f2;
+        padding: 6px 10px;
+        border-radius: 999px;
+      }
+
+      .domain-body {
+        display: grid;
+        grid-template-columns: 280px 1fr;
+        gap: 12px;
+        padding: 12px;
+      }
+
+      .input-block label {
+        display: block;
+        font-weight: 700;
+        color: var(--um-blue);
+        margin-bottom: 6px;
+      }
+
+      .row {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+      }
+
+      input[type="number"] {
+        width: 110px;
+        box-sizing: border-box;
+        padding: 10px;
+        border-radius: 8px;
+        border: 1px solid #cfd6ea;
+        font-size: 1rem;
+      }
+
+      input[type="number"]:focus {
+        outline: none;
+        border-color: var(--um-blue);
+        box-shadow: 0 0 0 2px rgba(0, 58, 108, 0.18);
+      }
+
+      .small {
+        font-size: 0.85rem;
+        color: #444;
+      }
+
+      .badge {
+        display: inline-block;
+        font-size: 0.85rem;
+        padding: 6px 10px;
+        border-radius: 999px;
+        border: 1px solid #d8def2;
+        background: #ffffff;
+        color: #333;
+        white-space: nowrap;
+      }
+
+      .weighted {
+        margin-top: 10px;
+        padding: 10px;
+        border-radius: 10px;
+        background: #ffffff;
+        border: 1px solid #e1e6f2;
+      }
+
+      .weighted .label {
+        font-weight: 700;
+        color: var(--um-blue);
+      }
+
+      .rubric {
+        background: #fbfcff;
+        border: 1px solid #e1e6f2;
+        border-radius: 10px;
+        padding: 12px;
+        min-height: 86px;
+      }
+
+      .rubric strong {
+        display: block;
+        color: var(--um-blue);
+        margin-bottom: 6px;
+      }
+
+      .rubric p {
+        margin: 0;
+        color: #222;
+        line-height: 1.35;
+        font-size: 0.9rem;
+      }
+
+      .error {
+        color: var(--um-red);
+        font-size: 0.9rem;
+        min-height: 1.2em;
+        margin-top: 10px;
+      }
+
+      .total {
+        margin-top: 14px;
+        padding: 14px;
+        border-radius: 12px;
+        border: 2px solid transparent;
+        display: none;
+        font-weight: 800;
+        text-align: center;
+        font-size: 1.1rem;
+      }
+
+      .total.pass {
+        background: #e8f5e9;
+        color: #2e7d32;
+        border-color: #2e7d32;
+      }
+
+      .total.fail {
+        background: #ffebee;
+        color: #c62828;
+        border-color: #c62828;
+      }
+
+      .actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 12px;
+        flex-wrap: wrap;
+      }
+
+      button {
+        padding: 10px 14px;
+        border-radius: 10px;
+        border: 1px solid #cfd6ea;
+        cursor: pointer;
+        font-weight: 700;
+        font-size: 0.95rem;
+        background: #ffffff;
+      }
+
+      button.primary {
+        border: none;
+        color: #ffffff;
+        background: linear-gradient(90deg, var(--um-blue), #005b9f);
+      }
+
+      button.primary:hover {
+        background: linear-gradient(90deg, #005b9f, var(--um-blue));
+      }
+
+      button:disabled {
+        opacity: 0.7;
+        cursor: default;
+      }
+
+      @media (max-width: 840px) {
+        .domain-body {
+          grid-template-columns: 1fr;
+        }
+        input[type="number"] {
+          width: 100%;
+        }
+        .row {
+          align-items: stretch;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>Year 4 Case Commentary Marks Calculator</h1>
+        <div class="sub">Weighted total out of 100</div>
+      </div>
+
+      <div class="content">
+        <div class="hint">
+          Enter marks from 0 to 10 for each domain. Rubric descriptors update automatically. The total appears live once all four scores are valid.
+        </div>
+
+        <div class="grid" id="grid"></div>
+
+        <div class="error" id="status"></div>
+
+        <div class="total" id="totalBox">
+          TOTAL: <span id="totalPct"></span>
+        </div>
+
+        <div class="actions">
+          <button class="primary" id="resetBtn" type="button">Reset</button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const bands = [
+        { min: 0, max: 2, label: "Needs improvement (0-2)" },
+        { min: 3, max: 4, label: "Fairly satisfactory (3-4)" },
+        { min: 5, max: 6, label: "Satisfactory (5-6)" },
+        { min: 7, max: 8, label: "Good (7-8)" },
+        { min: 9, max: 10, label: "Excellent (9-10)" },
+      ];
+
+      const domains = [
+        {
+          id: "clinical",
+          title: "Clinical Summary",
+          weight: 30,
+          rubric: [
+            "Incomplete or unclear summary. Major clinical details missing or inaccurate. Lacks logical flow and fails to convey the patient’s story or care journey. No mention of patient context and primary care context.",
+            "Basic and factual summary with limited organisation or interpretation. Key patient information included but lacks synthesis or insight. Focuses mainly on biomedical aspects with minimal reflection on the relevance or impact of the case to the patient and in the primary care context.",
+            "Adequate and generally clear summary covering main clinical details. Demonstrates basic understanding of the primary care approach. Some recognition of patient context, but lacks depth or holistic consideration.",
+            "Clear and well-organised summary that presents the clinical finding within the primary care context. Demonstrates sound clinical reasoning and awareness of patient-centered care. Addresses key biopsychosocial factors and their relevance to management, though with limited depth or integration.",
+            "Comprehensive and integrated summary that reflects the principles of holistic, patient-centered primary care. Demonstrates depth of clinical reasoning and management challenges, linking biopsychosocial factors. Clearly articulates the impact on the patient, family, and community.",
+          ],
+        },
+        {
+          id: "literature",
+          title: "Literature Review",
+          weight: 15,
+          rubric: [
+            "Minimal or no literature review. No or irrelevant citations. No evidence of critical thinking or connection to the case or primary care context.",
+            "Limited literature review with few and/or outdated sources. Mostly descriptive with little to no critical comment. Lacks clear evaluation of the applicability of cited studies. Minimal linkage to primary care relevance.",
+            "Basic literature review using some relevant and recent sources. Shows awareness of current knowledge with some critical reflection on applicability or limitations. Includes some reference to evidence-based guidelines and relevance to primary care practice.",
+            "Adequate and coherent literature review with relevant and recent sources. Demonstrates moderate critical analysis by commenting on the applicability and limitations of evidence. Integrates current evidence-based guidelines with clear relevance to primary care practice.",
+            "Comprehensive, up-to-date, and well-structured literature review. Demonstrates strong critical analysis and synthesis of current knowledge, explicitly evaluating the applicability, limitations, and selected aspects of evidence quality. Excellent integration of findings with clear discussion of implications for primary care practice.",
+          ],
+        },
+        {
+          id: "discussion",
+          title: "Discussion and Conclusion",
+          weight: 50,
+          rubric: [
+            "Superficial or unclear discussion. Lacks relevance to the case. Heavily theoretical or vague with no clear linkage to the patient or primary care context. No or minimal use of evidence. Disorganised or incoherent.",
+            "Basic discussion with some link to the case but lacks depth or consistency. Theoretical concepts are present but weakly applied. Limited integration of evidence. Minimal primary care relevance. Structure lacks clarity or coherence.",
+            "Adequate discussion with reasonable linkage to the case. Some theoretical concepts and evidence are applied, though not always well integrated. Shows understanding of primary care principles, but lacks depth or clarity in parts. Some reflection in discussion.",
+            "Clear and coherent discussion. Theory and evidence are appropriately applied and integrated into the case. Good linkage to patient’s context and relevance to family medicine. Demonstrates critical thinking within a primary care framework. Able to reflect on own practice and knowledge.",
+            "Comprehensive, insightful, coherent, and well-structured discussion. Strong linkage to patient’s case throughout. Effectively applies theory and integrates current, relevant evidence. Demonstrates deep understanding of primary care principles, continuity, comprehensiveness, and patient-centred care including thorough consideration of social determinants, community resources and health promotion. Able to critically reflect on own practices and knowledge. Able to identify areas of improvement.",
+          ],
+        },
+        {
+          id: "style",
+          title: "Style",
+          weight: 5,
+          rubric: [
+            "Writing is unclear and confusing. Frequent grammar, spelling, or punctuation errors. Overly wordy or repetitive; lacks conciseness. Informal or inappropriate tone for academic/clinical context. Inconsistent terminology and formatting. Writing lacks flow; ideas jump without coherence.",
+            "Some clarity but occasionally confusing sentences. Noticeable grammar and punctuation errors. Some repetition or unnecessary words. Tone occasionally too informal or inconsistent. Terminology and formatting inconsistently applied. Flow and coherence need improvement.",
+            "Generally clear and understandable writing. Minor grammar or punctuation errors not distracting. Mostly concise, some redundant phrases. Appropriate tone for context but could be more polished. Terminology and formatting mostly consistent. Logical flow with minor lapses.",
+            "Clear and well-structured writing. Few, if any, grammar or punctuation errors. Concise and precise language. Professional and consistent tone. Terminology and formatting consistently applied. Smooth flow with coherent transitions.",
+            "Exceptionally clear, concise, and polished writing. Error-free grammar, punctuation, and spelling. Engaging and professional tone throughout. Consistent and precise use of terminology and formatting. Seamless flow, excellent logical progression of idea.",
+          ],
+        },
+      ];
+
+      const grid = document.getElementById("grid");
+      const statusEl = document.getElementById("status");
+      const totalBox = document.getElementById("totalBox");
+      const totalPct = document.getElementById("totalPct");
+      const resetBtn = document.getElementById("resetBtn");
+
+      function bandIndex(score) {
+        for (let i = 0; i < bands.length; i++) {
+          if (score >= bands[i].min && score <= bands[i].max) return i;
+        }
+        return null;
+      }
+
+      function isValidScore(v) {
+        if (v === "" || v === null || v === undefined) return false;
+        const n = Number(v);
+        return Number.isFinite(n) && n >= 0 && n <= 10;
+      }
+
+      function weighted(score, weight) {
+        return (Number(score) / 10) * weight;
+      }
+
+      function render() {
+        grid.innerHTML = "";
+        for (const d of domains) {
+          const card = document.createElement("div");
+          card.className = "domain-card";
+
+          card.innerHTML = `
+            <div class="domain-head">
+              <div>
+                <div class="domain-title">${d.title}</div>
+              </div>
+              <div class="domain-weight">Weight: ${d.weight}%</div>
+            </div>
+
+            <div class="domain-body">
+              <div class="input-block">
+                <label for="score-${d.id}">Marks (0–10)</label>
+                <div class="row">
+                  <input id="score-${d.id}" type="number" min="0" max="10" step="any" inputmode="decimal" />
+                  <span class="badge" id="band-${d.id}">Band: —</span>
+                </div>
+
+                <div class="weighted">
+                  <div><span class="label">Weighted Marks:</span> <span id="w-${d.id}">—</span></div>
+                  <div class="small">(mark ÷ 10) × ${d.weight}</div>
+                </div>
+              </div>
+
+              <div class="rubric" id="rubric-${d.id}">
+                <strong>Descriptor</strong>
+                <p>Enter a score to view the descriptor.</p>
+              </div>
+            </div>
+          `;
+
+          grid.appendChild(card);
+        }
+      }
+
+      function updateOne(d) {
+        const input = document.getElementById(`score-${d.id}`);
+        const bandEl = document.getElementById(`band-${d.id}`);
+        const wEl = document.getElementById(`w-${d.id}`);
+        const rEl = document.getElementById(`rubric-${d.id}`);
+
+        const v = input.value;
+
+        if (!isValidScore(v)) {
+          bandEl.textContent = "Band: —";
+          wEl.textContent = "—";
+          rEl.innerHTML = `<strong>Descriptor</strong><p>Enter a score from 0 to 10.</p>`;
+          return { ok: false, score: null, weighted: null };
+        }
+
+        const score = Number(v);
+        const idx = bandIndex(score);
+        const bandLabel = idx === null ? "—" : bands[idx].label;
+
+        bandEl.textContent = `Band: ${bandLabel}`;
+        const w = weighted(score, d.weight);
+        wEl.textContent = `${w.toFixed(1)}%`;
+
+        if (idx !== null && d.rubric[idx]) {
+          rEl.innerHTML = `<strong>${bandLabel}</strong><p>${d.rubric[idx]}</p>`;
+        } else {
+          rEl.innerHTML = `<strong>Descriptor</strong><p>—</p>`;
+        }
+
+        return { ok: true, score, weighted: w };
+      }
+
+      function updateAll() {
+        statusEl.textContent = "";
+
+        const results = domains.map(updateOne);
+        const allOk = results.every(r => r.ok);
+
+        if (!allOk) {
+          totalBox.style.display = "none";
+          return;
+        }
+
+        const total = results.reduce((sum, r) => sum + r.weighted, 0);
+        totalPct.textContent = `${total.toFixed(1)}%`;
+
+        totalBox.classList.remove("pass", "fail");
+        totalBox.classList.add(total >= 50 ? "pass" : "fail");
+        totalBox.style.display = "block";
+      }
+
+      function attachListeners() {
+        for (const d of domains) {
+          const input = document.getElementById(`score-${d.id}`);
+          input.addEventListener("input", updateAll);
+        }
+
+        resetBtn.addEventListener("click", () => {
+          for (const d of domains) {
+            document.getElementById(`score-${d.id}`).value = "";
+          }
+          updateAll();
+        });
+      }
+
+      render();
+      attachListeners();
+      updateAll();
+    </script>
+  </body>
+</html>
